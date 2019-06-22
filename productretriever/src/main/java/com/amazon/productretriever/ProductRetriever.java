@@ -74,6 +74,8 @@ public class ProductRetriever {
 	    
 	     for (WebElement result:resultsList) {
 			 
+	    	 if(result.findElements(By.cssSelector(".a-size-base.a-color-secondary")).size()>0)
+		        {
 	    	     	 
 	    	 if(!(result.findElement(By.cssSelector(".a-size-base.a-color-secondary")).getText().equalsIgnoreCase("Sponsored")))
 	    	 {
@@ -100,6 +102,7 @@ public class ProductRetriever {
 	        System.out.println("Product Name is --- "+ProductName + " And Product Price is ---- $"+ProductPrice);
 	        hash_map.put(ProductName, ProductPrice);
 	     }  
+		        }
 	     }
 		 //System.out.println("Hash Map Content is "+hash_map);
 		 MapExcel.ExcelCreation(hash_map);

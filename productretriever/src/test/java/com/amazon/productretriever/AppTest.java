@@ -14,7 +14,7 @@ public class AppTest {
 
     @Test()
     public void AddContactHappyPathTest() throws JSONException, IOException, ParseException {
-        System.out.println("hello world");
+        System.out.println("Invoking the Test to Print Product details and Product Count");
         JSONReader e = new JSONReader();
 		MaptoExcel MapExcel = new MaptoExcel();
 		String url = e.parseJson("url");
