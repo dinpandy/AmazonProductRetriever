@@ -13,26 +13,27 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import com.amazon.productretriever.ObjectHandling;
 
-public class ProductRetriever {
+public class ProductRetriever  {
 
 	public static void main(String[] args) throws IOException, ParseException, JSONException, InterruptedException {
-		JSONReader e = new JSONReader();
-		MaptoExcel MapExcel = new MaptoExcel();
+		JSONReader e = new JSONReader();		
 		String url = e.parseJson("url");
 		String departmentcategory = e.parseJsonObj("data", "department");
 		String item = e.parseJsonObj("data", "item");
 		String avgCustomerReview = e.parseJsonObj("data", "avgCustomerReview");
-		int TotalProducts = RetrieveProducts(url,departmentcategory,item,avgCustomerReview);
-		System.out.println("Total Product Values are "+TotalProducts);
+		int[] foundProducts = RetrieveProducts(url,departmentcategory,item,avgCustomerReview);
+		System.out.println("Expected Product Values are "+foundProducts[0]+ "Actual Product found are "+foundProducts[1]);
+		
 	}
 		
-		public static  int RetrieveProducts(String url, String departmentcategory, String item, String avgCustomerReview)
+		public static  int[] RetrieveProducts(String url, String departmentcategory, String item, String avgCustomerReview)
 		{
-			JSONReader e = new JSONReader();
 			MaptoExcel MapExcel = new MaptoExcel();
+			int ExpectedProductCount=0;
 			int TotalNoOfProducts = 0;
-
+			HashMap<String, Double> hash_map = new HashMap<String, Double>();
 		System.setProperty("webdriver.chrome.driver", "chromeExe\\chromedriver.exe");
 		WebDriver driver = new ChromeDriver();
 		driver.get(url);
@@ -41,51 +42,143 @@ public class ProductRetriever {
 		try
 		{
 		
-		WebElement Root = (new WebDriverWait(driver, 2))
-				.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[contains(text(),'Departments')]")));
-		WebElement Dep = driver.findElement(By.xpath("//span[contains(text(),'" + departmentcategory + "')]"));
-		Actions actions = new Actions(driver);
-		
-		actions.moveToElement(Root).click(Dep).build().perform();
+		//Thread.sleep(1000);
+			WebElement Root,Dep,Dep1;
+		int timeout=0;
+		Actions actions;
+
+		while(true) {
+			timeout=timeout++;
+			try{
+				Thread.sleep(500);
+				//Root = (new WebDriverWait(driver, 10))
+					//	.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[contains(text(),'Departments')]"))); ;
+				
+				Root = (new WebDriverWait(driver, 10))
+					.until(ExpectedConditions.presenceOfElementLocated(By.xpath(ObjectHandling.dept))); ;
+			
+				
+				Dep = (new WebDriverWait(driver, 10))
+						.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[contains(text(),'" + departmentcategory + "')]")));
+				actions = new Actions(driver);	
+				actions.moveToElement(Root).click(Dep).build().perform();
+				Dep1 = (new WebDriverWait(driver, 10))
+						.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div/h1/b[contains(text(),'" + departmentcategory + "')]")));
+				
+				if (Dep1.isDisplayed()) {	
+					break;
+				}else if(timeout>10) {
+					throw new Error ("Page Not loaded for Selected Department- "+ departmentcategory);
+					};}
+			catch(Exception ex) {};
+		}
 
 		// WebElement search =
 		// driver.findElement(By.xpath("//input[@id='twotabsearchtextbox']"));
-		WebElement search = (new WebDriverWait(driver, 2))
-				.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@id='twotabsearchtextbox']")));
+		WebElement search = (new WebDriverWait(driver, 50))
+				.until(ExpectedConditions.presenceOfElementLocated(By.xpath(ObjectHandling.searchBox)));
 
 		search.sendKeys(new String[] { item });
 		search.sendKeys(Keys.ENTER);
 		
-		WebElement rating = (new WebDriverWait(driver, 2)).until(ExpectedConditions
+		WebElement rating = (new WebDriverWait(driver, 50)).until(ExpectedConditions
 				.presenceOfElementLocated(By.xpath("//span[contains(text(),'" + avgCustomerReview + "')]")));
 		
 		rating.click();
 		
-		Thread.sleep(6000);
-		List<WebElement> resultsList = driver.findElements(By.xpath("//div[starts-with(@data-cel-widget,'search_result_')]"));
+			
+		 //list to store page numbers
+	    List<WebElement> elements;
+	    
+	    //Count no of pagination link
+	    new WebDriverWait(
+	            driver, 20).until(
+	                    ExpectedConditions.presenceOfElementLocated(
+	                            By.xpath(ObjectHandling.pagination)));
+	
+	       
+	    elements = driver.findElements(By.xpath(ObjectHandling.paginationLink));
+	    
+	    	for (int i = 0; i < elements.size(); i++) {
+	    		WebElement element;
+	    		try {
+	    			element= driver.findElement(By.xpath(".//li/a[contains(text(),"+i+")]"));
+	    			element.sendKeys(Keys.ENTER);
+
+	    			
+	    			new WebDriverWait(
+	    		            driver, 80).until(
+	    		                    ExpectedConditions.presenceOfElementLocated(
+	    		                            By.xpath(".//li/a[contains(text(),"+i+")]/ancestor::li[@class='a-selected']")));
+	    			if(driver.findElement(By.xpath(".//li/a[contains(text(),"+i+")]/ancestor::li")).getAttribute("class").toString().equals("a-selected"))
+	    					{
+	    				PrintProductDetails(driver, hash_map);
+		    			System.out.println("TEST ---- Hash map value in Page " +i+" is " +hash_map.size());}
+	    					}
+	    			
+	    		catch(Exception ex) {
+	    			
+	    		}    	
+		    	
+		        }
+	    
+		
+	    	List<WebElement> Result= driver.findElements(By.xpath(ObjectHandling.resultList));
+	    	for (WebElement elemnt: Result) {
+	    	  if (elemnt.getText().toString().contains("of")) {
+	    		  ExpectedProductCount=Integer.parseInt(elemnt.getText().split(" of ")[1].split(" results ")[0].trim());
+	    	  };
+	    	}
+	    	    	
+		 
+		 System.out.println("Total Products Count "+ExpectedProductCount);
+		 MapExcel.ExcelCreation(hash_map);
+		 TotalNoOfProducts =hash_map.size();
+		 System.out.println("Total Number of Products Filtered is "+hash_map.size());
+	
+		}
+		catch(Exception ex)
+		{
+			System.out.println(ex);
+			ex.printStackTrace();
+		}
+		finally
+		{
+			driver.close();
+			driver.quit();
+		}
+		int [] result = {ExpectedProductCount, TotalNoOfProducts};
+	
+		return result;
+		
+	}
+		
+		public static   HashMap<String, Double> PrintProductDetails(WebDriver driver, HashMap<String, Double> hash_map)
+		{
+		List<WebElement> resultsList = driver.findElements(By.xpath(ObjectHandling.searchResult));
 		
 		double ProductPrice = 0.0;
 		String ProductName = "";
 		String ProductPriceText = "";
 		
-		HashMap<String, Double> hash_map = new HashMap<String, Double>(); 
+		 
 	    
 	    
 	    
 	     for (WebElement result:resultsList) {
 			 
-	    	 if(result.findElements(By.cssSelector(".a-size-base.a-color-secondary")).size()>0)
+	    	 if(result.findElements(By.cssSelector(ObjectHandling.sponsoredItems)).size()>0)
 		        {
 	    	     	 
-	    	 if(!(result.findElement(By.cssSelector(".a-size-base.a-color-secondary")).getText().equalsIgnoreCase("Sponsored")))
+	    	 if(!(result.findElement(By.cssSelector(ObjectHandling.sponsoredItems)).getText().equalsIgnoreCase("Sponsored")))
 	    	 {
-	    	 ProductName = result.findElement(By.cssSelector(".a-size-medium.a-color-base.a-text-normal")).getText();
+	    	 ProductName = result.findElement(By.cssSelector(ObjectHandling.productName)).getText();
 			 
 	        //System.out.println("Result Text Data is "+result.findElement(By.cssSelector(".a-size-medium.a-color-base.a-text-normal")).getText());
-	        if(result.findElements(By.cssSelector(".a-price")).size()>0)
+	        if(result.findElements(By.cssSelector(ObjectHandling.price)).size()>0)
 	        {
 	        	
-	        	ProductPriceText =result.findElement(By.cssSelector(".a-price")).getText().replaceAll("[$,]","");
+	        	ProductPriceText =result.findElement(By.cssSelector(ObjectHandling.price)).getText().replaceAll("[$,]","");
 	        	String[] Pricevalue = ProductPriceText.split("\n");
 	        	int firstNum = Integer.parseInt(Pricevalue[0]);
 	        	int SecondNum = Integer.parseInt(Pricevalue[1]);
@@ -104,25 +197,9 @@ public class ProductRetriever {
 	     }  
 		        }
 	     }
-		 //System.out.println("Hash Map Content is "+hash_map);
-		 MapExcel.ExcelCreation(hash_map);
-		 TotalNoOfProducts =hash_map.size();
-		 System.out.println("Total Number of Products Filtered is "+hash_map.size());
-	
+	     return hash_map;
+	     
 		}
-		catch(Exception ex)
-		{
-			System.out.println(ex);
-			ex.printStackTrace();
-		}
-		finally
-		{
-			driver.close();
-			driver.quit();
-		}
-		return TotalNoOfProducts;
-		
-	}
 		
 	
 
