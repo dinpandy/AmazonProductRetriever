@@ -1,5 +1,14 @@
 # AmazonProductRetriever
 
+This Document contains the following information:
+Project Scope
+Goal
+Benefits
+Architecture
+Design Considerations
+Result Screenshots
+Execution Method
+
 Project scope:
 Automate the following feature from https://www.amazon.com
   1) Launch any browser and open https://www.amazon.com
