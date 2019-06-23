@@ -108,6 +108,10 @@ Framework also has the same functionality of excluding the Sponsored Products li
 7. Framework Testcase Handles the Expected Data Dynamically. It collects the Expected Data from the Top of the page and then traverses through the page and then compares both the results and provides the test case status.
 This helps in avoiding the manual expected test data, which has more probability for failing since there could be increase or decrease in number of filtered products for each of the run and manually given expected test data would fail with the actual data.
 
+Note: a)All the Dependancy jars are available in the pom.xml file
+      b)Chrome browser has been selected for this framework and the chromedriver has been uploaded under chromeExe folder
+
+
 Code:
 List<WebElement> Result= driver.findElements(By.xpath(ObjectHandling.resultList));
 	    	for (WebElement elemnt: Result) {
@@ -128,6 +132,14 @@ Result Screenshot:
 ![image](https://user-images.githubusercontent.com/7686716/59982807-03e17700-9618-11e9-949b-0a6746d12f0a.png)
 
 ![image](https://user-images.githubusercontent.com/7686716/59982698-849f7380-9616-11e9-91c2-47565aea9112.png)
+
+Reports under Target/surefire-reports directory:
+
+![image](https://user-images.githubusercontent.com/7686716/59983233-87519700-961d-11e9-93e5-d0e9b8a257ec.png)
+
+![image](https://user-images.githubusercontent.com/7686716/59983248-a2bca200-961d-11e9-9279-7998919260eb.png)
+
+![image](https://user-images.githubusercontent.com/7686716/59983261-c54ebb00-961d-11e9-9714-26e9e235afad.png)
 
 
 Execution Method:
@@ -160,16 +172,13 @@ It will also create a file called “ResourceDetails.xls” in the same director
 
 ![image](https://user-images.githubusercontent.com/7686716/59982933-b1a15580-9619-11e9-97aa-52a0871c1f69.png)
 
-
-![image](https://user-images.githubusercontent.com/7686716/59982946-e31a2100-9619-11e9-8625-aa5517bf6255.png)
-
-![image](https://user-images.githubusercontent.com/7686716/59982961-1361bf80-961a-11e9-9279-d20e5fe2fad8.png)
+![image](https://user-images.githubusercontent.com/7686716/59983296-3aba8b80-961e-11e9-8739-194fce014c37.png)
 
 ![image](https://user-images.githubusercontent.com/7686716/59983000-98e56f80-961a-11e9-8085-47717ecb3c31.png)
 
 ![image](https://user-images.githubusercontent.com/7686716/59983021-cc27fe80-961a-11e9-9dac-50acd3a8e3cf.png)
 
-5. To Run the Test by Launching the browser, run the below mvn commands.
+5. Alternate commands to run the test;
 mvn clean
 mvn compile 
 mvn test
