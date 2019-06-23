@@ -24,7 +24,7 @@ public class ProductRetriever  {
 		String item = e.parseJsonObj("data", "item");
 		String avgCustomerReview = e.parseJsonObj("data", "avgCustomerReview");
 		int[] foundProducts = RetrieveProducts(url,departmentcategory,item,avgCustomerReview);
-		System.out.println("Expected Product Values are "+foundProducts[0]+ "Actual Product found are "+foundProducts[1]);
+		System.out.println("Expected Product Values are "+foundProducts[0]+ " \n Actual Product found are "+foundProducts[1]);
 		
 	}
 		
@@ -113,7 +113,7 @@ public class ProductRetriever  {
 	    			if(driver.findElement(By.xpath(".//li/a[contains(text(),"+i+")]/ancestor::li")).getAttribute("class").toString().equals("a-selected"))
 	    					{
 	    				PrintProductDetails(driver, hash_map);
-		    			System.out.println("TEST ---- Hash map value in Page " +i+" is " +hash_map.size());}
+		    			System.out.println("The Total Number of Products until Page " +i+" is " +hash_map.size());}
 	    					}
 	    			
 	    		catch(Exception ex) {
@@ -131,10 +131,10 @@ public class ProductRetriever  {
 	    	}
 	    	    	
 		 
-		 System.out.println("Total Products Count "+ExpectedProductCount);
+		 System.out.println("Total Expected Products Count is "+ExpectedProductCount);
 		 MapExcel.ExcelCreation(hash_map);
 		 TotalNoOfProducts =hash_map.size();
-		 System.out.println("Total Number of Products Filtered is "+hash_map.size());
+		 System.out.println("Total Number of Products Filtered(Actual Products Count) is "+TotalNoOfProducts);
 	
 		}
 		catch(Exception ex)

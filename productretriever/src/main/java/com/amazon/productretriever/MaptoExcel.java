@@ -39,7 +39,7 @@ public class MaptoExcel {
             
         }
     }
-    System.out.println("Minm Value is "+minm);
+    System.out.println("Minm Product Price is "+minm);
     Map <String, Double> maxProductMap = new LinkedHashMap<String, Double>();
     Map <String, Double> minProductMap = new LinkedHashMap<String, Double>();
     int rownum = 0;
@@ -69,19 +69,22 @@ public class MaptoExcel {
                 = new FileOutputStream(new File("ProductDetails.xls"));
         workbook.write(out);
         out.close();
+        System.out.println("===================================");
         System.out.println("Minimum Price Product details: ");
         for (String keys : minProductMap.keySet())
         {
         	   System.out.println("Product Name =>" + keys + " Product Value => $" + minProductMap.get(keys));
            
         }
+        System.out.println("===================================");
+        System.out.println("===================================");
         System.out.println("Maximum Price Product details: ");
         for (String keys : maxProductMap.keySet())
         {
         	 System.out.println("Product Name =>" + keys + " Product Value => $" + maxProductMap.get(keys));
                      
         }
-      
+        System.out.println("===================================");
 
     } catch (FileNotFoundException e) {
         e.printStackTrace();
